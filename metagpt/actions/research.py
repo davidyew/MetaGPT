@@ -22,7 +22,7 @@ written, critically acclaimed, objective and structured reports on the given tex
 
 RESEARCH_TOPIC_SYSTEM = "You are an AI researcher assistant, and your research topic is:\n#TOPIC#\n{topic}"
 
-SEARCH_TOPIC_PROMPT = """Please provide up to 2 necessary keywords related to your research topic for Google search. \
+SEARCH_TOPIC_PROMPT = """Please provide up to 2 necessary keywords related to your research topic:{topic} for Google search. \
 Your response must be in JSON format, for example: ["keyword1", "keyword2"]."""
 
 SUMMARIZE_SEARCH_PROMPT = """### Requirements
@@ -110,7 +110,8 @@ class CollectLinks(Action):
             A dictionary containing the search questions as keys and the collected URLs as values.
         """
         system_text = system_text if system_text else RESEARCH_TOPIC_SYSTEM.format(topic=topic)
-        keywords = await self._aask(SEARCH_TOPIC_PROMPT, [system_text])
+        new_search_topic_prompt = SEARCH_TOPIC_PROMPT.format(topic=topic)
+        keywords = await self._aask(new_search_topic_prompt, [system_text])
         try:
             keywords = OutputParser.extract_struct(keywords, list)
             keywords = TypeAdapter(list[str]).validate_python(keywords)
